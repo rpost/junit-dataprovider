@@ -1,7 +1,10 @@
 package com.tngtech.java.junit.dataprovider;
 
+import static java.lang.Character.toUpperCase;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,7 +13,7 @@ import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -113,6 +116,12 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         }
     }
 
+    @Override
+    public Description describeChild(FrameworkMethod method) {
+        // TODO Auto-generated method stub
+        return super.describeChild(method);
+    }
+
     /**
      * {@inheritDoc}
      * <p>
@@ -132,9 +141,6 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
         // are not raised as {@link RuntimeException} to go the JUnit way of detecting errors. This implies that we have
         // to browse the whole class for test methods and dataproviders again :-(.
 
-        for (FrameworkMethod testMethod : getTestClassInt().getAnnotatedMethods(Test.class)) {
-            testValidator.validateTestMethod(testMethod, errors);
-        }
         for (FrameworkMethod testMethod : getTestClassInt().getAnnotatedMethods(UseDataProvider.class)) {
             List<FrameworkMethod> dataProviderMethods = getDataProviderMethods(testMethod);
             if (dataProviderMethods.isEmpty()) {
@@ -175,10 +181,9 @@ public class DataProviderRunner extends BlockJUnit4ClassRunner {
      * @return the exploded list of test methods (never {@code null})
      */
     @Override
-    protected List<FrameworkMethod> computeTestMethods() {
+    public List<FrameworkMethod> computeTestMethods() {
         if (computedTestMethods == null) {
-            // Further method for generation is required due to stubbing of "super.computeTestMethods()" is not possible
-            computedTestMethods = generateExplodedTestMethodsFor(super.computeTestMethods());
+            computedTestMethods = generateExplodedTestMethodsFor(getTestClass().getAnnotatedMethods(UseDataProvider.class));
         }
         return computedTestMethods;
     }

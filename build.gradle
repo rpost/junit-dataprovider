@@ -266,6 +266,35 @@ cpdCheck {
     source = subprojects*.sourceSets*.main*.java*.srcDirs + subprojects*.sourceSets*.test*.java*.srcDirs // only check java source code
 }
 
+// coveralls gradle plugin multi-module project workaround
+def publishedProjects = subprojects.findAll()
+task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
+    description = 'Generates an aggregate report from all subprojects'
+
+    dependsOn(publishedProjects.test)
+
+    additionalSourceDirs = files(publishedProjects.sourceSets.main.allSource.srcDirs)
+    sourceDirectories = files(publishedProjects.sourceSets.main.allSource.srcDirs)
+    classDirectories = files(publishedProjects.sourceSets.main.output)
+    executionData = files(publishedProjects.jacocoTestReport.executionData)
+
+    doFirst {
+        executionData = files(executionData.findAll { it.exists() })
+    }
+
+    reports {
+        html.enabled = true // human readable
+        xml.enabled = true // required by coveralls
+    }
+}
+coveralls {
+    sourceDirs = publishedProjects.sourceSets.main.allSource.srcDirs.flatten()
+    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+}
+tasks.coveralls {
+    dependsOn jacocoRootReport
+}
+
 // -- build and publish artifacts -------------------------------------------------------------------------------------
 if (!hasProperty('sonatypeUsername')) {
     ext.sonatypeUsername = ''

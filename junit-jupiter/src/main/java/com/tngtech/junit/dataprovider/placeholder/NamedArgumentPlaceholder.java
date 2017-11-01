@@ -1,8 +1,12 @@
 package com.tngtech.junit.dataprovider.placeholder;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.List;
+
+import org.junit.platform.commons.logging.Logger;
+import org.junit.platform.commons.logging.LoggerFactory;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -32,10 +36,12 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <td>{@link Object#toString()}</td>
  * </tr>
  * </table>
+ * Note: Test code must be compiled with "-parameters" option in order to retrieve formal parameter names!
  */
-// TODO required "-parameters" option for java compiler!
 // TODO a lot of equal code to ArgumentPlaceholder, e.g. javadoc above, the constants below ...
 public class NamedArgumentPlaceholder extends BasePlaceholder {
+
+    private static final Logger logger = LoggerFactory.getLogger(NamedArgumentPlaceholder.class);
 
     /**
      * W {@link String} representation of {@code null}
@@ -73,26 +79,26 @@ public class NamedArgumentPlaceholder extends BasePlaceholder {
             to = from;
         }
 
-        // LinkedHashMap<String, Object> namedArguments = data.getNamedArguments();
         List<Object> namedArguments = data.getArguments();
         from = (from >= 0) ? from : namedArguments.size() + from;
         to = (to >= 0) ? to + 1 : namedArguments.size() + to + 1;
-        return formatAll(data.getTestMethod().getParameters(), namedArguments.subList(from, to));
+        return formatAll(getSubArrayOfMethodParameters(data.getTestMethod(), from, to), namedArguments.subList(from, to));
     }
 
     /**
-     * Formats the given arguments by retrieving it's {@link String} representation and separate it by comma (=
-     * {@code ,}).
+     * Formats the given parameters and arguments to a comma-separated list of {@code $parameterName=$argumentName}.
+     * Arguments {@link String} representation are therefore treated specially.
      *
+     * @param parameters used to for formatting
      * @param arguments to be formatted
-     * @return the {@link String} representation of the given {@link Object}{@code []}
+     * @return the formatted {@link String} of the given {@link Parameter}{@code []} and {@link List}{@code <Object>}
      */
     protected String formatAll(Parameter[] parameters, List<Object> arguments) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (int idx = 0; idx < arguments.size(); idx++) { // TODO test if parameters.length always >= arguments.size()?
-            Parameter parameter = parameters[idx];
+        for (int idx = 0; idx < arguments.size(); idx++) {
+            String parameterName = (parameters.length > idx) ? parameters[idx].getName() : "?";
             Object argument = arguments.get(idx);
-            stringBuilder.append(parameter.getName()).append("=").append(format(argument));
+            stringBuilder.append(parameterName).append("=").append(format(argument));
             if (idx < arguments.size() - 1) {
                 stringBuilder.append(", ");
             }
@@ -127,6 +133,17 @@ public class NamedArgumentPlaceholder extends BasePlaceholder {
         }
         result = result.replaceAll("\0", "\\\\0").replaceAll("\r", "\\\\r").replaceAll("\n", "\\\\n");
         return replaceNonPrintableChars(result, STRING_NON_PRINTABLE);
+    }
+
+    private Parameter[] getSubArrayOfMethodParameters(Method testMethod, int fromIndex, int toIndex) {
+        Parameter[] parameters = testMethod.getParameters();
+        if (parameters.length > 0 && !parameters[0].isNamePresent()) {
+            logger.warn(() -> String.format("Parameter names on method '%s' are not available"
+                    + ". To store formal parameter names, compile the source file with the '-parameters' option"
+                    + ". See also https://docs.oracle.com/javase/tutorial/reflect/member/methodparameterreflection.html",
+                    testMethod));
+        }
+        return Arrays.copyOfRange(parameters, fromIndex, toIndex);
     }
 
     private String formatPrimitiveArray(Object primitiveArray) {

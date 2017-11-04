@@ -30,7 +30,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * </tr>
  * </table>
  */
-abstract class AbstractArgumentPlaceholder extends BasePlaceholder {
+public abstract class AbstractArgumentPlaceholder extends BasePlaceholder {
 
     /**
      * {@link String} representation of {@code null}
@@ -47,7 +47,7 @@ abstract class AbstractArgumentPlaceholder extends BasePlaceholder {
      */
     protected static final String STRING_NON_PRINTABLE = "<np>";
 
-    AbstractArgumentPlaceholder(String placeholderRegex) {
+    protected AbstractArgumentPlaceholder(String placeholderRegex) {
         super(placeholderRegex);
     }
 

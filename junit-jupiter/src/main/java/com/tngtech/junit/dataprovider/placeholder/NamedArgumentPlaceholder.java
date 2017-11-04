@@ -1,5 +1,6 @@
 package com.tngtech.junit.dataprovider.placeholder;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
@@ -37,10 +38,10 @@ public class NamedArgumentPlaceholder extends AbstractArgumentPlaceholder {
             to = from;
         }
 
-        List<Object> namedArguments = data.getArguments();
-        from = (from >= 0) ? from : namedArguments.size() + from;
-        to = (to >= 0) ? to + 1 : namedArguments.size() + to + 1;
-        return formatAll(getSubArrayOfMethodParameters(data.getTestMethod(), from, to), namedArguments.subList(from, to));
+        List<Object> arguments = data.getArguments();
+        from = (from >= 0) ? from : arguments.size() + from;
+        to = (to >= 0) ? to + 1 : arguments.size() + to + 1;
+        return formatAll(getSubArrayOfMethodParameters(data.getTestMethod(), from, to), arguments.subList(from, to));
     }
 
     /**
@@ -54,9 +55,14 @@ public class NamedArgumentPlaceholder extends AbstractArgumentPlaceholder {
     protected String formatAll(Parameter[] parameters, List<Object> arguments) {
         StringBuilder stringBuilder = new StringBuilder();
         for (int idx = 0; idx < arguments.size(); idx++) {
-            String parameterName = (parameters.length > idx) ? parameters[idx].getName() : "?";
+            Parameter parameter = (parameters.length > idx) ? parameters[idx] : null;
+
+            String parameterName = (parameter == null) ? "?" : parameter.getName();
             Object argument = arguments.get(idx);
-            stringBuilder.append(parameterName).append("=").append(format(argument));
+
+            stringBuilder.append(parameterName).append("=").append(format(
+                    new ParameterAndArgument((parameter == null) ? null : parameter.getType(),
+                            (parameter == null) ? new Annotation[0] : parameter.getAnnotations(), argument)));
             if (idx < arguments.size() - 1) {
                 stringBuilder.append(", ");
             }

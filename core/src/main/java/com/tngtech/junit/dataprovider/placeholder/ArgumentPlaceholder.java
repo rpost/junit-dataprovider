@@ -1,5 +1,6 @@
 package com.tngtech.junit.dataprovider.placeholder;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
 
 /**
@@ -45,12 +46,16 @@ public class ArgumentPlaceholder extends AbstractArgumentPlaceholder {
      */
     protected String formatAll(List<Object> arguments) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < arguments.size(); i++) {
-            stringBuilder.append(format(arguments.get(i)));
-            if (i < arguments.size() - 1) {
+        for (int idx = 0; idx < arguments.size(); idx++) {
+            stringBuilder.append(format(arguments.get(idx)));
+            if (idx < arguments.size() - 1) {
                 stringBuilder.append(", ");
             }
         }
         return stringBuilder.toString();
+    }
+
+    protected String format(Object argument) {
+        return format(new ParameterAndArgument(null, new Annotation[0], argument));
     }
 }

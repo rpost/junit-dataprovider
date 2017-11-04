@@ -1,14 +1,15 @@
 package com.tngtech.junit.dataprovider.placeholder;
 
-import static com.tngtech.junit.dataprovider.placeholder.NamedArgumentPlaceholder.STRING_EMPTY;
-import static com.tngtech.junit.dataprovider.placeholder.NamedArgumentPlaceholder.STRING_NON_PRINTABLE;
-import static com.tngtech.junit.dataprovider.placeholder.NamedArgumentPlaceholder.STRING_NULL;
+import static com.tngtech.junit.dataprovider.placeholder.argformat.DefaultFormatter.STRING_EMPTY;
+import static com.tngtech.junit.dataprovider.placeholder.argformat.DefaultFormatter.STRING_NON_PRINTABLE;
+import static com.tngtech.junit.dataprovider.placeholder.argformat.DefaultFormatter.STRING_NULL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -23,6 +24,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.support.ReflectionSupport;
+
+import com.tngtech.junit.dataprovider.placeholder.AbstractArgumentPlaceholder.ParameterAndArgument;
 
 class NamedArgumentPlaceholderTest {
 
@@ -496,7 +499,7 @@ class NamedArgumentPlaceholderTest {
         final TestToString argument = new TestToString("\r");
 
         // When:
-        String result = underTest.format(argument);
+        String result = underTest.format(new ParameterAndArgument(null, new Annotation[0], argument));
 
         // Then:
         assertThat(result).isEqualTo("\\r");
@@ -508,7 +511,7 @@ class NamedArgumentPlaceholderTest {
         final TestToString argument = new TestToString("test\rtest\r");
 
         // When:
-        String result = underTest.format(argument);
+        String result = underTest.format(new ParameterAndArgument(null, new Annotation[0], argument));
 
         // Then:
         assertThat(result).isEqualTo("test\\rtest\\r");
@@ -520,7 +523,7 @@ class NamedArgumentPlaceholderTest {
         final TestToString argument = new TestToString("\n");
 
         // When:
-        String result = underTest.format(argument);
+        String result = underTest.format(new ParameterAndArgument(null, new Annotation[0], argument));
 
         // Then:
         assertThat(result).isEqualTo("\\n");
@@ -532,7 +535,7 @@ class NamedArgumentPlaceholderTest {
         final TestToString argument = new TestToString("1\n2\n3");
 
         // When:
-        String result = underTest.format(argument);
+        String result = underTest.format(new ParameterAndArgument(null, new Annotation[0], argument));
 
         // Then:
         assertThat(result).isEqualTo("1\\n2\\n3");
@@ -545,7 +548,7 @@ class NamedArgumentPlaceholderTest {
                 "A very\r\nlong text\nwith multiple\rdifferent newline\n\rvariations.");
 
         // When:
-        String result = underTest.format(argument);
+        String result = underTest.format(new ParameterAndArgument(null, new Annotation[0], argument));
 
         // Then:
         assertThat(result).isEqualTo("A very\\r\\nlong text\\nwith multiple\\rdifferent newline\\n\\rvariations.");
@@ -557,7 +560,7 @@ class NamedArgumentPlaceholderTest {
         final TestToString argument = new TestToString(null);
 
         // When:
-        String result = underTest.format(argument);
+        String result = underTest.format(new ParameterAndArgument(null, new Annotation[0], argument));
 
         // Then:
         assertThat(result).isEqualTo(STRING_NULL);

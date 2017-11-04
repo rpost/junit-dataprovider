@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.tngtech.junit.dataprovider.DataProvider;
 import com.tngtech.junit.dataprovider.UseDataProvider;
+import com.tngtech.junit.dataprovider.placeholder.argformat.ArgumentFormat;
 
 @ExtendWith(AnnotationArgumentPlaceholderDataProviderExtension.class)
 class AnnotationArgumentPlaceholderAcceptanceTest {
@@ -20,7 +21,7 @@ class AnnotationArgumentPlaceholderAcceptanceTest {
 
     @TestTemplate
     @UseDataProvider
-    void test(@Format(UnwrapFormatter.class) WrappedClass clazz) {
+    void test(@ArgumentFormat(UnwrapFormatter.class) WrappedClass clazz) {
         // TODO
     }
 }

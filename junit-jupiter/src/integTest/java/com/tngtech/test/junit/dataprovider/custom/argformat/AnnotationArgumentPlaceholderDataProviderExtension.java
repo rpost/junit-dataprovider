@@ -12,6 +12,7 @@ import com.tngtech.junit.dataprovider.DisplayNameContext;
 import com.tngtech.junit.dataprovider.UseDataProvider;
 import com.tngtech.junit.dataprovider.UseDataProviderInvocationContextProvider;
 import com.tngtech.junit.dataprovider.convert.ConverterContext;
+import com.tngtech.junit.dataprovider.placeholder.AnnotationBasedArgumentPlaceholder;
 import com.tngtech.junit.dataprovider.placeholder.BasePlaceholder;
 import com.tngtech.junit.dataprovider.resolver.DataProviderResolverContext;
 
@@ -42,7 +43,7 @@ class AnnotationArgumentPlaceholderDataProviderExtension
     protected DisplayNameContext getDisplayNameContext(DataProvider dataProvider) {
         @SuppressWarnings("unchecked")
         List<BasePlaceholder> defaultPlaceholders = (List<BasePlaceholder>) getDefaultPlaceholders();
-        defaultPlaceholders.add(0, new AnnotationArgumentPlaceholder());
+        defaultPlaceholders.add(0, new AnnotationBasedArgumentPlaceholder());
         return new DisplayNameContext(dataProvider.format(), defaultPlaceholders);
     }
 }

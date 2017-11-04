@@ -33,7 +33,7 @@ public class DataProviderFrameworkMethod extends FrameworkMethod {
     final Object[] parameters;
 
     /**
-     * Format of test method name.
+     * ArgumentFormat of test method name.
      * <p>
      * This field is package private (= visible) for testing.
      * </p>

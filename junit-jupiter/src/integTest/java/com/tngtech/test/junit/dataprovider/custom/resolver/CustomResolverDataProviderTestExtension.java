@@ -20,9 +20,10 @@ class CustomResolverDataProviderTestExtension
 
     @Override
     protected DataProviderResolverContext getDataProviderResolverContext(ExtensionContext extensionContext,
-            CustomResolverDataProviderTest annotation) {
-        return new DataProviderResolverContext(extensionContext.getRequiredTestMethod(), asList(annotation.resolver()),
-                annotation.resolveStrategy(), asList(annotation.location()), DataProvider.class, annotation.value());
+            CustomResolverDataProviderTest testAnnotation) {
+        return new DataProviderResolverContext(extensionContext.getRequiredTestMethod(),
+                asList(testAnnotation.resolver()), testAnnotation.resolveStrategy(), asList(testAnnotation.location()),
+                DataProvider.class, testAnnotation.value());
     }
 
     @Override

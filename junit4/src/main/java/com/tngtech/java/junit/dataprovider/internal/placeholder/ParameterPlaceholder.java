@@ -7,6 +7,7 @@ import java.util.List;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.junit.dataprovider.placeholder.ArgumentPlaceholder;
 import com.tngtech.junit.dataprovider.placeholder.ReplacementData;
+import com.tngtech.junit.dataprovider.placeholder.argformat.DefaultFormatter;
 
 /**
  * This placeholder format the parameters of a dataprovider test as comma-separated {@link String} according to the
@@ -43,7 +44,7 @@ public class ParameterPlaceholder extends ArgumentPlaceholder {
      * This field is package private (= visible) for testing.
      * </p>
      */
-    static final String STRING_NULL = ArgumentPlaceholder.STRING_NULL;
+    static final String STRING_NULL = DefaultFormatter.STRING_NULL;
 
     /**
      * {@link String} representation of {@code ""}
@@ -51,7 +52,7 @@ public class ParameterPlaceholder extends ArgumentPlaceholder {
      * This field is package private (= visible) for testing.
      * </p>
      */
-    static final String STRING_EMPTY = ArgumentPlaceholder.STRING_EMPTY;
+    static final String STRING_EMPTY = DefaultFormatter.STRING_EMPTY;
 
     /**
      * {@link String} representation of an non-printable character
@@ -59,7 +60,7 @@ public class ParameterPlaceholder extends ArgumentPlaceholder {
      * This field is package private (= visible) for testing.
      * </p>
      */
-    static final String STRING_NON_PRINTABLE = ArgumentPlaceholder.STRING_NON_PRINTABLE;
+    static final String STRING_NON_PRINTABLE = DefaultFormatter.STRING_NON_PRINTABLE;
 
     // -- Begin: copied from origin BasePlaceholder for backwards compatibility reasons --------------------------------
 

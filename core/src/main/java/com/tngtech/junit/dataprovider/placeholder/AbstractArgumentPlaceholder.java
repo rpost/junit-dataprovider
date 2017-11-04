@@ -1,8 +1,11 @@
 package com.tngtech.junit.dataprovider.placeholder;
 
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.tngtech.junit.dataprovider.placeholder.argformat.ArgumentFormat;
+import com.tngtech.junit.dataprovider.placeholder.argformat.ArgumentFormatter;
+import com.tngtech.junit.dataprovider.placeholder.argformat.DefaultFormatter;
 
 /**
  * This abstract placeholder is able to format arguments of a dataprovider test as comma-separated {@link String}
@@ -30,118 +33,107 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * </tr>
  * </table>
  */
-public abstract class AbstractArgumentPlaceholder extends BasePlaceholder {
+abstract class AbstractArgumentPlaceholder extends BasePlaceholder {
 
-    /**
-     * {@link String} representation of {@code null}
-     */
-    protected static final String STRING_NULL = "<null>";
+    protected static class ParameterAndArgument {
 
-    /**
-     * {@link String} representation of {@code ""}
-     */
-    protected static final String STRING_EMPTY = "<empty string>";
+        private final Class<?> parameterType;
+        private final Annotation[] parameterAnnotations;
+        private final Object argument;
 
-    /**
-     * {@link String} representation of an non-printable character
-     */
-    protected static final String STRING_NON_PRINTABLE = "<np>";
+        public ParameterAndArgument(Class<?> parameterType, Annotation[] parameterAnnotations, Object argument) {
+            this.parameterType = parameterType;
+            this.parameterAnnotations = parameterAnnotations;
+            this.argument = argument;
+        }
 
-    protected AbstractArgumentPlaceholder(String placeholderRegex) {
+        public Class<?> getParameterType() {
+            return parameterType;
+        }
+
+        public Annotation[] getParameterAnnotations() {
+            return parameterAnnotations;
+        }
+
+        public Object getArgument() {
+            return argument;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((argument == null) ? 0 : argument.hashCode());
+            result = prime * result + Arrays.hashCode(parameterAnnotations);
+            result = prime * result + ((parameterType == null) ? 0 : parameterType.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            ParameterAndArgument other = (ParameterAndArgument) obj;
+            if (argument == null) {
+                if (other.argument != null) {
+                    return false;
+                }
+            } else if (!argument.equals(other.argument)) {
+                return false;
+            }
+            if (!Arrays.equals(parameterAnnotations, other.parameterAnnotations)) {
+                return false;
+            }
+            if (parameterType == null) {
+                if (other.parameterType != null) {
+                    return false;
+                }
+            } else if (!parameterType.equals(other.parameterType)) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public String toString() {
+            return "ParameterAndArgument [parameterType=" + parameterType + ", parameterAnnotations="
+                    + Arrays.toString(parameterAnnotations) + ", argument=" + argument + "]";
+        }
+    }
+
+    AbstractArgumentPlaceholder(String placeholderRegex) {
         super(placeholderRegex);
     }
 
-    @SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE", justification = "false positive if 'param.toString()' returns 'null'")
-    protected String format(Object param) {
-        if (param == null) {
-            return STRING_NULL;
+    protected String format(ParameterAndArgument parameterAndArgument) {
+        Annotation[] parameterAnnotations = parameterAndArgument.getParameterAnnotations();
+        Object argument = parameterAndArgument.getArgument();
 
-        } else if (param.getClass().isArray()) {
-            if (param.getClass().getComponentType().isPrimitive()) {
-                return formatValuesOfPrimitiveArray(param);
-            }
-            return "[" + formatValuesOfArray((Object[]) param) + "]";
-
-        } else if (param instanceof String && ((String) param).isEmpty()) {
-            return STRING_EMPTY;
-
-        }
-
-        String result;
-        if (param instanceof String) {
-            result = (String) param;
-        } else {
-            result = param.toString();
-        }
-        if (result == null) { // maybe null if "param.toString()" returns null
-            return STRING_NULL;
-        }
-        result = result.replaceAll("\0", "\\\\0").replaceAll("\r", "\\\\r").replaceAll("\n", "\\\\n");
-        return replaceNonPrintableChars(result, STRING_NON_PRINTABLE);
-    }
-
-    private String formatValuesOfPrimitiveArray(Object primitiveArray) {
-        Class<?> componentType = primitiveArray.getClass().getComponentType();
-
-        if (boolean.class.equals(componentType)) {
-            return Arrays.toString((boolean[]) primitiveArray);
-
-        } else if (byte.class.equals(componentType)) {
-            return Arrays.toString((byte[]) primitiveArray);
-
-        } else if (char.class.equals(componentType)) {
-            return Arrays.toString((char[]) primitiveArray);
-
-        } else if (short.class.equals(componentType)) {
-            return Arrays.toString((short[]) primitiveArray);
-
-        } else if (int.class.equals(componentType)) {
-            return Arrays.toString((int[]) primitiveArray);
-
-        } else if (long.class.equals(componentType)) {
-            return Arrays.toString((long[]) primitiveArray);
-
-        } else if (float.class.equals(componentType)) {
-            return Arrays.toString((float[]) primitiveArray);
-
-        } else if (double.class.equals(componentType)) {
-            return Arrays.toString((double[]) primitiveArray);
-        }
-        throw new IllegalStateException("Called 'formatPrimitiveArray' on non-primitive array");
-    }
-
-    private String formatValuesOfArray(Object[] array) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < array.length; i++) {
-            stringBuilder.append(format(array[i]));
-            if (i < array.length - 1) {
-                stringBuilder.append(", ");
+        Class<? extends ArgumentFormatter<?>> formatter = (Class) DefaultFormatter.class;
+        for (Annotation annotation : parameterAnnotations) {
+            if (ArgumentFormat.class.isInstance(annotation)) { // TODO meta annotation
+                formatter = ((ArgumentFormat) annotation).value();
+                break;
             }
         }
-        return stringBuilder.toString();
-    }
 
-    private String replaceNonPrintableChars(String input, String replacement) {
-        StringBuilder result = new StringBuilder();
-        for (int offset = 0; offset < input.length();) {
-            int codePoint = input.codePointAt(offset);
-            offset += Character.charCount(codePoint);
+        try {
+            return ((Class<ArgumentFormatter<Object>>) formatter).newInstance().format(argument);
+        } catch (InstantiationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
 
-            // Replace invisible control characters and unused code points
-            switch (Character.getType(codePoint)) {
-                case Character.CONTROL: // \p{Cc}
-                case Character.FORMAT: // \p{Cf}
-                case Character.PRIVATE_USE: // \p{Co}
-                case Character.SURROGATE: // \p{Cs}
-                case Character.UNASSIGNED: // \p{Cn}
-                    result.append(replacement);
-                    break;
-
-                default:
-                    result.append(Character.toChars(codePoint));
-                    break;
-            }
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        return result.toString();
+        return null; // TODO
     }
 }

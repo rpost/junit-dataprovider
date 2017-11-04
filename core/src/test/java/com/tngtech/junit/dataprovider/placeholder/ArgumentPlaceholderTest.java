@@ -1,8 +1,8 @@
 package com.tngtech.junit.dataprovider.placeholder;
 
-import static com.tngtech.junit.dataprovider.placeholder.ArgumentPlaceholder.STRING_EMPTY;
-import static com.tngtech.junit.dataprovider.placeholder.ArgumentPlaceholder.STRING_NON_PRINTABLE;
-import static com.tngtech.junit.dataprovider.placeholder.ArgumentPlaceholder.STRING_NULL;
+import static com.tngtech.junit.dataprovider.placeholder.argformat.DefaultFormatter.STRING_EMPTY;
+import static com.tngtech.junit.dataprovider.placeholder.argformat.DefaultFormatter.STRING_NON_PRINTABLE;
+import static com.tngtech.junit.dataprovider.placeholder.argformat.DefaultFormatter.STRING_NULL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;

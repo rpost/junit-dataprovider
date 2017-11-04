@@ -103,7 +103,7 @@ public @interface DataProvider {
     boolean trimValues() default true;
 
     /**
-     * Format pattern to be used to generate test method description. The following placeholders are by default
+     * ArgumentFormat pattern to be used to generate test method description. The following placeholders are by default
      * available (for more information see their implementations in package
      * {@link com.tngtech.java.junit.dataprovider.internal.placeholder}:
      * <table border="1" summary="Possible placeholders">

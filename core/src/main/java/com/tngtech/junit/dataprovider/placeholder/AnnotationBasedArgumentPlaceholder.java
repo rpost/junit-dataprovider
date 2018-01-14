@@ -33,12 +33,13 @@ public class AnnotationBasedArgumentPlaceholder extends AbstractArgumentPlacehol
         return formatAll(getParametersAndArguments(data.getTestMethod(), arguments, from, to));
     }
 
+    // TODO use from and to!
     private List<ParameterAndArgument> getParametersAndArguments(Method testMethod, List<Object> arguments, int from, int to) {
         Annotation[][] parameterAnnotations = testMethod.getParameterAnnotations();
         Class<?>[] parameterTypes = testMethod.getParameterTypes();
 
         List<ParameterAndArgument> result = new ArrayList<ParameterAndArgument>();
-        for (int idx = 0; idx < arguments.size() && idx < parameterTypes.length; idx++) { // TODO test!
+        for (int idx = from; idx < to && idx < arguments.size() && idx < parameterTypes.length; idx++) { // TODO test!
             result.add(new ParameterAndArgument(parameterTypes[idx], parameterAnnotations[idx], arguments.get(idx)));
         }
         return result;

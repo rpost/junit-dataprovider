@@ -24,4 +24,21 @@ class AnnotationArgumentPlaceholderAcceptanceTest {
     void test(@ArgumentFormat(UnwrapFormatter.class) WrappedClass clazz) {
         // TODO
     }
+
+    @DataProvider(format = "[%i: %aa[0..1]]")
+    static Object[][] dataProvider2() {
+        // @formatter:off
+        return new Object[][] {
+            { new WrappedClass(AnnotationArgumentPlaceholderAcceptanceTest.class), new WrappedClass(AnnotationArgumentPlaceholderAcceptanceTest.class), new WrappedClass(AnnotationArgumentPlaceholderAcceptanceTest.class) },
+        };
+        // @formatter:on
+    }
+
+    @TestTemplate
+    @UseDataProvider
+    void test2(@ArgumentFormat(UnwrapFormatter.class) WrappedClass clazz1,
+            @ArgumentFormat(UnwrapFormatter.class) WrappedClass clazz2,
+            @ArgumentFormat(UnwrapFormatter.class) WrappedClass clazz3) {
+        // TODO
+    }
 }

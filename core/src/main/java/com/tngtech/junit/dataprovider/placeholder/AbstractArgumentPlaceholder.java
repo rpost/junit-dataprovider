@@ -118,7 +118,7 @@ abstract class AbstractArgumentPlaceholder extends BasePlaceholder {
 
         Class<? extends ArgumentFormatter<?>> formatter = (Class) DefaultFormatter.class;
         for (Annotation annotation : parameterAnnotations) {
-            if (ArgumentFormat.class.isInstance(annotation)) { // TODO meta annotation
+            if (ArgumentFormat.class.isInstance(annotation)) { // TODO meta annotation in core? really?
                 formatter = ((ArgumentFormat) annotation).value();
                 break;
             }
